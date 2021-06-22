@@ -41,24 +41,21 @@ func mergeTwoLists(l1 *ListNode, l2 *ListNode) *ListNode {
 }
 ```
 
-
-## [合并有序数组](https://leetcode-cn.com/problems/merge-sorted-array/)
+## [和为K的子数组](https://leetcode-cn.com/problems/subarray-sum-equals-k/)
 
 ```go
-func merge(nums1 []int, m int, nums2 []int, n int)  {
-    tail := m+n-1
-    // 最后元素的下标为长度-1
-    m--
-    n--
-    for m >= 0 || n >= 0 {
-        if n < 0 || (m >= 0 && nums1[m] > nums2[n]) {
-            nums1[tail] = nums1[m]
-            m--
-        } else {
-            nums1[tail] = nums2[n]
-            n--
+func subarraySum(nums []int, k int) int {
+    res := 0
+    count := map[int]int{0:1}
+    preSum := 0
+    for i := 0; i < len(nums); i++ {
+        preSum += nums[i]
+        if v, ok := count[preSum-k]; ok {
+            res += v
         }
-        tail--
+        count[preSum]++
     }
+    
+    return res
 }
 ```
