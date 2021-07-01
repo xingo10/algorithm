@@ -1,4 +1,6 @@
-# [LRU](https://leetcode-cn.com/problems/lru-cache/)
+# [LRU Cache](https://leetcode-cn.com/problems/lru-cache/)
+
+模拟golang里的"container/list"包实现双向链表
 
 ```go
 type Entry struct {
@@ -134,4 +136,43 @@ func (this *LRUCache) Put(key int, value int)  {
  * param_1 := obj.Get(key);
  * obj.Put(key,value);
  */
+```
+
+# [子域名访问计数](https://leetcode-cn.com/problems/subdomain-visit-count/)
+
+```go
+import "strings"
+
+func subdomainVisits(cpdomains []string) []string {
+    /*
+    解题思路：
+        用map存放每个域名和对应的访问次数。其中域名作为key存入map，访问次数作为value
+        把域名通过"."进行分割，不断修改域名去掉前缀，并使用map记录相应的访问次数
+    */
+    domainMap := make(map[string]int)
+    for _, value := range cpdomains {
+        // 数组中每个元素格式是"次数 域名"，所以这里使用" "分割
+        // 第一个为访问次数，第二个为域名
+        ss := strings.Split(value, " ")
+        count, _ := strconv.Atoi(ss[0])
+        // 对于每个域名，通过"."继续分割，这里使用递归的方式
+        // 传入domainMap是为了记录分割后的域名及访问次数
+        visits(ss[1], count, domainMap)
+    }
+
+    ans := make([]string, 0)
+    for k, v := range domainMap {
+        ans = append(ans, fmt.Sprintf("%d %s", v, k))
+    }
+    return ans
+}
+
+func visits(domain string, count int, domainMap map[string]int) {
+    domainMap[domain] += count
+    dotIndex := strings.Index(domain, ".")
+    if dotIndex < 0 {
+        return
+    }
+    visits(domain[dotIndex+1:], count, domainMap)
+}
 ```
