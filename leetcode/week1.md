@@ -73,6 +73,28 @@ func moveZeroes(nums []int)  {
 }
 ```
 
+## [反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
+
+```go
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func reverseList(head *ListNode) *ListNode {
+    var dummy *ListNode
+    for head != nil {
+        temp := head.Next
+        head.Next = dummy
+        dummy = head
+        head = temp
+    }
+    return dummy
+}
+```
+
 ## [两数之和 II](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
 
 ```go
