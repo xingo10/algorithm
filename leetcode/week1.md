@@ -95,6 +95,94 @@ func reverseList(head *ListNode) *ListNode {
 }
 ```
 
+## [K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
+
+```go
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func reverseKGroup(head *ListNode, k int) *ListNode {
+    /*
+    解题思路：
+        1. 分多组遍历整个链表，重新组织链表
+        2. 反转每组链表(每组移动k-1步)
+        3. 上一组链表末尾指向反转后的当前组链表头
+        4. 反转后当前组链表末尾指向未反转时该组链表末尾的next
+        5. 需要记录上一组链表尾和该组原有链表末尾的next
+        6. 为了避免处理表头为null的情况，在表头增加一个保护点，方便进行反转处理
+    */
+    protect := &ListNode{0, head}
+    // 上一组的末尾
+    last := protect
+    for head != nil {
+        // 获取每组尾部，如果end为nil，说明到了链表末尾或者是剩余长度不足k
+        end := getEnd(head, k)
+        if end == nil {
+            break
+        }
+
+        // 保留下一组的头节点，用于下一次遍历head
+        nextGroupHead := end.Next
+
+        // 反转后，end是该组头节点，head是末尾
+        reverse(head, end)
+        
+        // 上一组末尾和该组头关联
+        last.Next = end
+        // head的next指向下一组，是使得last的next指向下一组
+        head.Next = nextGroupHead
+        
+        // 分组遍历
+        // head是该组末尾，last是上一组末尾，因此把当前组末尾赋值给last
+        last = head
+        // head到下一组链表头
+        head = nextGroupHead
+    }
+    return protect.Next
+}
+
+func getEnd(head *ListNode, k int) *ListNode {
+    for head != nil {
+        k--
+        if k == 0 {
+            break
+        }
+        head = head.Next
+    }
+    return head
+}
+
+/*
+  dummy              end
+    3   -> 4    ->    5     
+         start
+
+         dummy       end
+    3   -> 4    ->    5
+                    start
+*/
+func reverse(start, end *ListNode) {
+    if start == end {
+        return
+    }
+    dummy := start
+    start = start.Next
+    for start != end {
+        temp := start.Next
+        start.Next = dummy
+        dummy = start
+        start = temp
+    }
+    // 反转后，end成组的头节点，end的next需要指向dummy，因为dummy在start的前一个节点
+    end.Next = dummy
+    return
+}
+```
+
 ## [两数之和 II](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
 
 ```go
