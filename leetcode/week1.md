@@ -183,6 +183,140 @@ func reverse(start, end *ListNode) {
 }
 ```
 
+## [环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+```go
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func hasCycle(head *ListNode) bool {
+    if head == nil || head.Next == nil {
+        return false
+    }
+    slow := head
+    fast := head.Next.Next
+    for slow != nil && fast != nil && fast.Next != nil {
+        if slow == fast {
+            return true
+        }
+        slow = slow.Next
+        fast = fast.Next.Next
+    }
+    return false
+}
+```
+
+## [有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
+
+```go
+func isValid(s string) bool {
+    /*
+    解题思路：
+        最近相关性使用栈
+        1. 遍历字符串
+        2. 如果是左括号，入栈
+        3. 如果是右括号，取栈顶元素和右括号配对，配对成功继续，配对不成功说明是无效
+        4. 如果字符串结束了，栈不为空，说明还有左括号，因此字符串无效
+    */
+    check := map[byte]byte{
+        ')': '(',
+        ']': '[',
+        '}': '{',
+    }
+    // 使用数组模拟栈操作
+    stack := make([]byte, 0)
+    for i := range s {
+        // 如果是左括号，入栈
+        if s[i] == '(' || s[i] == '{' || s[i] == '[' {
+            stack = append(stack, s[i])
+        } else {
+            if len(stack) == 0 {
+                return false
+            }
+            top := stack[len(stack)-1]
+            stack = stack[:len(stack)-1]
+            if v, ok := check[s[i]]; ok && v != top {
+                return false
+            }
+        }
+    }
+    return len(stack) == 0
+}
+```
+
+## [最小栈](https://leetcode-cn.com/problems/min-stack/)
+
+```go
+type MinStack struct {
+    min []int
+    stack []int
+}
+
+
+/** initialize your data structure here. */
+func Constructor() MinStack {
+    return MinStack{}
+}
+
+
+func min(x, y int) int {
+    if x < y {
+        return x
+    }
+    return y
+}
+
+
+func (this *MinStack) Push(val int)  {
+    // 如果min不为空，需要对比min的栈顶元素和存放的值大小，取小的放入
+    if len(this.min) == 0 {
+        this.min = append(this.min, val)
+    } else {
+        topMin := this.min[len(this.min)-1]
+        this.min = append(this.min, min(topMin, val))
+    }
+    this.stack = append(this.stack, val)
+}
+
+
+func (this *MinStack) Pop()  {
+    if len(this.stack) != 0 {
+        this.stack = this.stack[:len(this.stack)-1]
+        this.min = this.min[:len(this.min)-1]
+    }
+}
+
+
+func (this *MinStack) Top() int {
+    if len(this.stack) == 0 {
+        return 0
+    }
+    return this.stack[len(this.stack)-1]
+}
+
+
+func (this *MinStack) GetMin() int {
+    if len(this.min) == 0 {
+        return 0
+    }
+    return this.min[len(this.min)-1]
+}
+
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * obj := Constructor();
+ * obj.Push(val);
+ * obj.Pop();
+ * param_3 := obj.Top();
+ * param_4 := obj.GetMin();
+ */
+```
+
 ## [两数之和 II](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
 
 ```go
