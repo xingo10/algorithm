@@ -371,8 +371,8 @@ func calculate(s string) int {
     numberStarted := false
 
     // 在'('前有运算符的话，需要补零，如：1+3+(2+4)
-    // 数字后面不需要补零，所以为false
-    // ')'后面不需要补零
+    // 数字前不需要补零，所以为false
+    // ')'前不需要补零
     needZero := true
     var value int
     for i := range s {
