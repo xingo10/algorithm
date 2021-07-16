@@ -317,6 +317,170 @@ func (this *MinStack) GetMin() int {
  */
 ```
 
+## [逆波兰表达式求值](https://leetcode-cn.com/problems/evaluate-reverse-polish-notation/)
+
+```go
+func evalRPN(tokens []string) int {
+    /*
+    解题思路：
+        逆波兰表达式计算方式：
+            如果当前字符为数字，则压栈；
+            如果为运算符，则取栈顶两个元素进行运算，运算的结果放入栈
+    */
+    // 存放数字
+    stack := make([]int, 0)
+    for _, s := range tokens {
+        if v, err := strconv.Atoi(s); err == nil {
+            stack = append(stack, v)
+        } else if s == "+" || s == "-" || s == "*" || s == "/" {
+            if len(stack) < 2 {
+                continue
+            }
+            x := stack[len(stack)-1]
+            y := stack[len(stack)-2]
+            stack = stack[:len(stack)-2]
+            // 需要注意"-"、"/"的操作两侧数字的顺序
+            switch s {
+            case "+":
+                stack = append(stack, x+y)
+            case "-":
+                stack = append(stack, y-x)
+            case "*":
+                stack = append(stack, x*y)
+            case "/":
+                stack = append(stack, y/x)  
+            }
+        }
+    }
+    // 计算完后栈中最后一个元素为结果，直接返回
+    return stack[0]
+}
+```
+
+## [基本计算器](https://leetcode-cn.com/problems/basic-calculator/)
+
+```go
+func calculate(s string) int {
+    // 运算符
+    ops := make([]byte, 0)
+    // 逆波兰表达式
+    tokens := make([]string, 0)
+
+    // 判断是否在parse字符为数字
+    // 如果数字后面跟着字符，并且number_started为true，把parse的数字保存到tokens
+    numberStarted := false
+
+    // 在'('前有运算符的话，需要补零，如：1+3+(2+4)
+    // 数字后面不需要补零，所以为false
+    // ')'后面不需要补零
+    needZero := true
+    var value int
+    for i := range s {
+        if s[i] >= '0' && s[i] <= '9' {
+            // go把string转换成int的方式
+            value = value * 10 + int(s[i] - '0')
+            numberStarted = true
+            continue
+        } else if numberStarted {
+            // 如果数字后面跟着其他字符，需要把之前的数字保存
+            tokens = append(tokens, strconv.Itoa(value))
+            numberStarted = false
+            needZero = false
+            value = 0
+        }
+
+        if s[i] == ' ' {
+            continue
+        }
+
+        if s[i] == '(' {
+            ops = append(ops, s[i])
+            needZero = true
+            continue
+        }
+
+        // 如果是')'，ops中的运算符出栈，存入tokens中，直到遇到'('结束
+        if s[i] == ')' {
+            for len(ops) != 0 && ops[len(ops)-1] != '(' {
+                topOps := ops[len(ops)-1]
+                ops = ops[:len(ops)-1]
+                tokens = append(tokens, string(topOps))
+            }
+            
+            // 把'('也从ops中出栈
+            ops = ops[:len(ops)-1]
+            needZero = false
+            continue
+        }
+
+        // fmt.Println("tokens: ", tokens)
+        if needZero {
+            tokens = append(tokens, "0")
+        }
+        // 处理+-*/
+        // 判断运算符优先级，如果当前的运算符优先级小于等于ops栈顶优先级，栈顶运算符出栈保存在tokens中
+        // 如：1*2+3,需要tokens变为12*3+
+        for len(ops) != 0 && getPriority(s[i]) <= getPriority(ops[len(ops)-1]) {
+            topOps := ops[len(ops)-1]
+            tokens = append(tokens, string(topOps))
+            ops = ops[:len(ops)-1]
+        }
+        // 把当前运算符存入ops栈
+        ops = append(ops, s[i])
+        needZero = true
+    }
+    // 如果末尾是数字，需要把最后的数字保存到tokens中
+    if numberStarted {
+        tokens = append(tokens, strconv.Itoa(value))
+    }
+    for len(ops) != 0 {
+        topOps := ops[len(ops)-1]
+        tokens = append(tokens, string(topOps))
+        ops = ops[:len(ops)-1]
+    }
+    fmt.Println(tokens)
+    return evalRPN(tokens)
+}
+
+func getPriority(b byte) int {
+    switch b {
+    case '+','-':
+        return 1
+    case '*','/':
+        return 1
+    }
+    return 0
+}
+
+func evalRPN(tokens []string) int {
+    stack := make([]int, 0)
+    for _, s := range tokens {
+        if v, err := strconv.Atoi(s); err == nil {
+            stack = append(stack, v)
+        } else if s == "+" || s == "-" || s == "*" || s == "/" {
+            if len(stack) < 2 {
+                continue
+            }
+            x := stack[len(stack)-1]
+            y := stack[len(stack)-2]
+            stack = stack[:len(stack)-2]
+            // 需要注意"-"、"/"的操作两侧数字的顺序
+            switch s {
+            case "+":
+                stack = append(stack, y+x)
+            case "-":
+                stack = append(stack, y-x)
+            case "*":
+                stack = append(stack, y*x)
+            case "/":
+                stack = append(stack, y/x)  
+            }
+        }
+    }
+    return stack[0]
+}
+```
+
 ## [两数之和 II](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
 
 ```go
