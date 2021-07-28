@@ -176,3 +176,85 @@ func corpFlightBookings(bookings [][]int, n int) []int {
 
 }
 ```
+
+## 滑动窗口
+
+### [三数之和](https://leetcode-cn.com/problems/3sum/)
+```go
+func threeSum(nums []int) [][]int {
+    /*
+    解题思路：
+        1. 先进行排序
+        2. 固定i，然后使用滑动窗口
+        3. 从i+1 ~ len(nums)-1，相加数据判断是否为0，从而进行保存
+        4. 如果相加和大于0，说明右侧下标过大，右侧减小，否则左侧增加
+    */
+    sort.Ints(nums)
+    ans := make([][]int, 0)
+    sets := make(map[string]bool)
+    for i := range nums {
+        // 因为排序过，所以如果i和i-1相等，那么说明这个数计算过，不需要再次计算。
+        if i > 0 && nums[i] == nums[i-1] {
+            continue
+        }
+        left := i+1
+        right := len(nums)-1
+        for left < right {
+            sum := nums[i] + nums[left] + nums[right]
+            if sum == 0 {
+                key := fmt.Sprintf("%d%d%d", nums[i], nums[left], nums[right])
+                if !sets[key] {
+                    ans = append(ans, []int{nums[i], nums[left], nums[right]})
+                    sets[key] = true
+                }
+                right--
+                left++
+            } else if sum > 0 {
+                right--
+            } else {
+                left++
+            }
+        }
+    }
+    return ans
+}
+```
+
+### [盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+
+```go
+func maxArea(height []int) int {
+    /*
+    解题思路：
+        容器可以容纳的水 = 两条线的横坐标距离 * 最短的纵坐标长度
+        可以用滑动窗口的思想
+    */
+    maxArea := 0
+    i := 0
+    j := len(height)-1
+    for i < j {
+        area := (j-i) * min(height[i], height[j])
+        maxArea = max(maxArea, area)
+        if height[i] < height[j] {
+            i++
+        } else {
+            j--
+        }
+    }
+    return maxArea
+}
+
+func max(x, y int) int {
+    if x > y {
+        return x
+    }
+    return y
+}
+
+func min(x, y int) int {
+    if x < y {
+        return x
+    }
+    return y
+}
+```
